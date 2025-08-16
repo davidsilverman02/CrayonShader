@@ -1,4 +1,4 @@
-Shader "Custom/NewTestShader"
+Shader "CrayonShader/CrayonShader"
 {
     SubShader
     {
@@ -13,7 +13,26 @@ Shader "Custom/NewTestShader"
             #pragma vertex vert
             #pragma fragment frag
 
-			#include "UnityCG.cginc"
+			#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
+
+            TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
+			// _CameraNormalsTexture contains the view space normals transformed to be in 0-1
+			TEXTURE2D_SAMPLER2D(_CameraNormalsTexture, sampler_CameraNormalsTexture);
+			TEXTURE2D_SAMPLER2D(_CameraDepthTexture, sampler_CameraDepthTexture);
+
+            float4 _MainTex_TexelSize;
+
+			float _Scale;
+
+            // works as a threshold for measuring the depth of an object
+			float _DepthThreshold;
+			float _DepthNormalThreshold;
+			float _DepthNormalThresholdScale;
+
+			float _NormalThreshold;
+
+			// This matrix is populated in ShaderPostProcessing
+			float4x4 _ClipToView;
 
             struct AttributesDefault
             {
@@ -35,7 +54,8 @@ Shader "Custom/NewTestShader"
             // the vertex shader of the shader, returns position of vertices in the scene relative to where they need to be
             VaryingsDefault Vert(AttributesDefault v)
             {
-
+                // the final VaryingsDefault returned by the function
+                VaryingsDefault finalVert;
             }
 
             // the fragment shader of the shader
