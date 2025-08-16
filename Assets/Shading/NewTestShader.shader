@@ -8,6 +8,7 @@ Shader "Custom/NewTestShader"
         {
             HLSLPROGRAM
             // I'm starting with a simple outline shader with hopes to add noise
+            // Next step of the project is to make a volume component and add variables
             
             #pragma vertex vert
             #pragma fragment frag
