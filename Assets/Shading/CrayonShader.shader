@@ -1,5 +1,9 @@
 Shader "CrayonShader/CrayonShader"
 {
+    // Properties
+    // {
+    //     // Needs to be filled, currently working on the shader itself, planning to try making a material first
+    // }
     SubShader
     {
         Cull Off ZWrite Off ZTest Always
@@ -34,13 +38,10 @@ Shader "CrayonShader/CrayonShader"
 			// This matrix is populated in ShaderPostProcessing
 			float4x4 _ClipToView;
 
-            struct AttributesDefault
-            {
-                float3 vertex : POSITION;
-            };
 
-            // VaryingsDefault taken from HLSL std library and modified
-            struct VaryingsDefault 
+
+            // VaryingsDefault taken from HLSL std library and modified, mistakenly added unneccessary AttributesDefault
+            struct CrayonVaryingsDefault 
             {
                 float4 vertex : SV_POSITION;
 				float2 texcoord : TEXCOORD0;
@@ -52,14 +53,25 @@ Shader "CrayonShader/CrayonShader"
             };
 
             // the vertex shader of the shader, returns position of vertices in the scene relative to where they need to be
-            VaryingsDefault Vert(AttributesDefault v)
+            CrayonVaryingsDefault Vert(AttributesDefault v)
             {
                 // the final VaryingsDefault returned by the function
-                VaryingsDefault finalVert;
+                CrayonVaryingsDefault finalVert;
+                finalVert.vertex = float4(v.vertex.xy, 0.0, 1.0);
+                finalVert.texcoord = TransformTriangleVertexToUV(v.vertex.xy);
+
+                // transforms point from clip to view space
+                finalVert.viewSpaceDir = mul(_ClipToView, finalVert.vertex).xyz;
+
+                #if UNITY_UV_STARTS_AT_TOP
+                    finalVert.texcoord = finalVert.texcoord * float2(1.0, -1.0) + float2(0.0, 1.0);
+                #endif
+
+                finalVert.texcoordStereo = TransformStereoScreenSpaceTex(finalVert.texcoord, 1.0);
             }
 
             // the fragment shader of the shader
-            float4 Frag(Varyings i) : SV_Target
+            float4 Frag(CrayonVaryingsDefault i) : SV_Target
             {
 
             }
